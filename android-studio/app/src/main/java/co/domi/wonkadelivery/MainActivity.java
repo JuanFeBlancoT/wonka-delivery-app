@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         runOnUiThread(new Runnable(){
             @Override
             public void run() {
-                Toast.makeText(mainA, "Order #"+message+ "ready", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mainA, "Order #"+message+ " ready", Toast.LENGTH_SHORT).show();
 
             }
         });
