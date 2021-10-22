@@ -1,26 +1,19 @@
 package view;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
 public class Communication extends Thread{
 
-	public final int M_SIZE = 200;
+	public final int M_SIZE = 20;
 	
 	private DatagramSocket socket;
 	private String[] connectedIp;
+	private MainServer serverPeer;
 	
 	public void run() {
 		try {
@@ -33,6 +26,8 @@ public class Communication extends Thread{
 				socket.receive(packet);
 				
 				String message = new String(packet.getData()).trim();
+				String senderInfo = packet.getSocketAddress().toString();
+				serverPeer.onMessage(message, senderInfo);
 			}
 		} catch (SocketException e) {
 			e.printStackTrace();
@@ -41,14 +36,14 @@ public class Communication extends Thread{
 		}
 	}
 	
-	public void sendMessage(String message) {
+	public void sendMessage(String message, String ipS, String port) {
 		new Thread(
 			()->{
 				
 				try {
-					String[] ipData = getIpData();
-					InetAddress ip = InetAddress.getByName(ipData[0]);
-					DatagramPacket packet = new DatagramPacket(message.getBytes(), message.getBytes().length, ip, Integer.parseInt(ipData[1]));
+
+					InetAddress ip = InetAddress.getByName(ipS);
+					DatagramPacket packet = new DatagramPacket(message.getBytes(), message.getBytes().length, ip, Integer.parseInt(port));
 					socket.send(packet);
 				} catch (UnknownHostException e) {
 					
@@ -60,9 +55,9 @@ public class Communication extends Thread{
 			}).start();
 	}
 
-	private String[] getIpData() {
-		// TODO find the ip of the orders client; [0] = ip, [1] = puerto
-		return null;
+	public void setServerPeer(MainServer serverPeer) {
+		this.serverPeer = serverPeer;
 	}
-			
+
+	
 }
